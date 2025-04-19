@@ -137,3 +137,14 @@ selected = st.feedback("stars")
 #いけるなら画像を保存する
 
 #supabase上に保存するコードを実行する
+# 保存ボタン
+if st.button("保存", key="save_story_button"):
+    try:
+        success = save_story(user_id, title, story0, story1, story2, story3)
+        if success:
+            st.success("ストーリーを保存しました！")
+            st.rerun()
+        else:
+            st.error("ストーリーの保存に失敗しました。")
+    except Exception as e:
+        st.error(f"エラーが発生しました: {str(e)}")
