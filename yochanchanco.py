@@ -11,10 +11,10 @@ import requests # stability.ai用
 
 
 ### 受け取る！！！！！　その１（1/2）
-sex_options = "男の子"
-job_options = "魔法使い"
-theme_options = "ファンタジー"
-preset_options = "enhance"
+# sex_options = "男の子"
+# job_options = "魔法使い"
+# theme_options = "ファンタジー"
+# preset_options = "enhance"
 
 
 ###　絵本作るのボタンが押されたとき
@@ -69,7 +69,7 @@ def make_story_gpt(sex, job, theme): # gptで物語つくる
 
 
 
-gpted_story = make_story_gpt(sex_options, job_options, theme_options)
+### gpted_story = make_story_gpt(sex_options, job_options, theme_options)
 
 
 ###　絵本作るのボタンが押されたとき
@@ -127,7 +127,7 @@ def make_image_prompt_gpt(story): # gptで画像生成プロンプトのパー�
 
 
 
-gpted_prompt_parts = make_image_prompt_gpt(gpted_story)
+### gpted_prompt_parts = make_image_prompt_gpt(gpted_story)
 
 
 ###　絵本作るのボタンが押されたとき
@@ -162,10 +162,10 @@ def concat_image_prompt(parts): # パーツをつなげて起承転結の画像�
     return image_prompt_all
 
 
-merged_listed_prompts = concat_image_prompt(gpted_prompt_parts)
+### merged_listed_prompts = concat_image_prompt(gpted_prompt_parts)
 
 ### 受け取る！！！！！　その２（2/2）　セッション情報にあるはずなので、頑張って受け取る
-page = 0
+# page = 0
 
 
 ###　ページに応じて違う画像を生成することができる　→　絵本作るのボタンで、1枚分作って、その後はどうするか悩む
@@ -196,16 +196,16 @@ def make_image_stability(image_prompt_all, preset, now_page): # Stability.aiで�
         raise RuntimeError(f"Stability API error: {response.status_code} – {response.text}")
 
     if response.status_code == 200:
-        with open(f"./out/{now_page}.jpeg", 'wb') as file:
+        with open(f"./output/{now_page}.jpeg", 'wb') as file:
             file.write(response.content)
     else:
         raise Exception(str(response.json()))
-    return f"./out/{now_page}.jpeg"
+    return f"./output/{now_page}.jpeg"
 
 
 
 
 ###　この画像の受け渡し方が分からん。とりあえず/outに入る
 
-make_image_stability(merged_listed_prompts, preset_options, page)
+### make_image_stability(merged_listed_prompts, preset_options, page)
 
