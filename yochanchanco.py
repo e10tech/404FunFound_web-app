@@ -11,6 +11,7 @@ import requests # stability.ai用
 
 
 ### 受け取る！！！！！　その１（1/2）
+
 sex_options = "男の子"
 job_options = "魔法使い"
 theme_options = "ファンタジー"

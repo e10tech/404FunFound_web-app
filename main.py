@@ -5,6 +5,7 @@ import streamlit as st  #streamlitの使用に必要
 from supabase import create_client, Client
 from elevenlabs import ElevenLabs, play #ElevenLabs APIの利用に必要
 from io import BytesIO  #ElevenLabsで作成した合成音声をバイト型に変換
+import datetime # エラー出てたので追加（supabase用）
 
 #環境変数の読み込み
 load_dotenv()

@@ -3,6 +3,10 @@ from dotenv import load_dotenv  #.envファイルの読み込みに必要なモ�
 import requests
 import os   #.envから環境設定変数を取得するために必要
 
+from openai import OpenAI
+import json
+from yochanchanco import make_story_gpt, make_image_prompt_gpt, concat_image_prompt, make_image_stability
+
 #ページ設定を行う。サイトのタイトルやアイコン、画面幅を設定する
 #おそらくファイルの一番初めに記載しておかないといけないみたい
 st.set_page_config(
@@ -107,7 +111,8 @@ elif st.session_state.gender == "女（おんな）の子":
     job_options.extend(["魔法使い", "お姫様", "アイドル"])
 with st.container():
     st.markdown(" <div style='text-align: center; color:#634320;'><h5>どんなお仕事（しごと）をしてみる？</h5></div>", unsafe_allow_html=True)
-    st.selectbox(label="", options=job_options, key="job", label_visibility="collapsed")
+    input_job = st.selectbox(label="", options=job_options, label_visibility="collapsed")
+    st.session_state.job = input_job
 
 #どんな絵本にするか選択(st.session_state.theme)
 themes = ["ふしぎ", "びっくり", "うれしい"]
@@ -170,7 +175,11 @@ with st.container():
 #             """, unsafe_allow_html=True)
 
 #ストーリーの作成するコードの実行
-#from yochanchanco import YochanChanko
+gpted_story = make_story_gpt(st.session_state.gender, st.session_state.job, st.session_state.theme)
+gpted_prompt_parts = make_image_prompt_gpt(gpted_story)
+merged_listed_prompts = concat_image_prompt(gpted_prompt_parts)
+page = 0 # このハードコーディングは残す
+make_image_stability(merged_listed_prompts, st.session_state.preset, page)
 
 #４枚分の画像生成するためのプロンプトを生成するコードの実行（辞書型になってる）
 #セッション情報にアペンドする
