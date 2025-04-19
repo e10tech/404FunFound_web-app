@@ -22,7 +22,11 @@ def voice_generated(id, text):
         "content-type": "application/json"
     }
     response = requests.post(url, json=payload, headers=headers)
-
     result = response.json()
-    audio_data = result['generatedVoice']['audioFileUrl']
-    return audio_data
+
+    response = requests.get(download_url)
+    download_url = result['generatedVoice']['audioFileDownloadUrl']
+    save_path = './output/voice.mp3'
+    if response.status_code == 200:
+        with open(save_path, 'wb') as file:
+            file.write(response.content)

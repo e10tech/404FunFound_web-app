@@ -2,6 +2,7 @@ import streamlit as st
 from elevenlabs import ElevenLabs, play #ElevenLabs APIの利用に必要
 from io import BytesIO  #ElevenLabsで作成した合成音声をバイト型に変換
 from dotenv import load_dotenv  #.envファイルの読み込みに必要なモジュール
+from streamlit_extras.switch_page_button import switch_page
 import base64
 import requests
 import os   #.envから環境設定変数を取得するために必要
@@ -77,13 +78,8 @@ st.container(height=5, border=False)
 
 col1, col2, col3 = st.columns([1, 2, 1])
 with col1:
-    st.markdown("""
-                <a href="/output3" target="_self">
-                    <button style='font-size:18px; padding:0.5em 1em; border-radius:8px; background-color:#4CAF50; color:white; border:none;width:100%;'>
-                        前のページへ
-                    </button>
-                </a>
-            """, unsafe_allow_html=True)
+    if st.button("📖 前のページへ", use_container_width=True):
+        switch_page("output3")  # pages/output2.py に遷移する
 
 with st.container():
     #画像を挿入したい時に使う
@@ -141,3 +137,14 @@ selected = st.feedback("stars")
 #いけるなら画像を保存する
 
 #supabase上に保存するコードを実行する
+# 保存ボタン
+if st.button("保存", key="save_story_button"):
+    try:
+        success = save_story(user_id, title, story0, story1, story2, story3)
+        if success:
+            st.success("ストーリーを保存しました！")
+            st.rerun()
+        else:
+            st.error("ストーリーの保存に失敗しました。")
+    except Exception as e:
+        st.error(f"エラーが発生しました: {str(e)}")
