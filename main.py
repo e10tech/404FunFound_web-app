@@ -21,32 +21,71 @@ st.set_page_config(
 def go_to_page(page_name):
     st.session_state.page = page_name
 
-# Supabaseクライアントの初期化
-def get_supabase_client():
-    url: str = os.environ.get("SUPABASE_URL")
-    key: str = os.environ.get("SUPABASE_KEY")
-    supabase: Client = create_client(url, key)
-    return supabase
 
-def sign_up(email: str, password: str):
-    """ユーザー登録"""
-    supabase = get_supabase_client()
-    return supabase.auth.sign_up({"email": email, "password": password})
+#--------------------------------
+# supabase関連の関数
+#--------------------------------
 
-def sign_in(email: str, password: str):
-    """ログイン"""
-    supabase = get_supabase_client()
-    return supabase.auth.sign_in_with_password({"email": email, "password": password})
+# Supabase設定（ローカルで動かすためのもの。クラウドで実行する場合は削除する）
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-def sign_out():
-    """ログアウト"""
-    supabase = get_supabase_client()
-    supabase.auth.sign_out()
-    st.session_state.clear()
+# セッション状態の初期化
+if "user" not in st.session_state:
+    st.session_state.user = None
+if "access_token" not in st.session_state:
+    st.session_state.access_token = None
+if "supabase" not in st.session_state:
+    st.session_state.supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-def check_auth():
-    """認証状態のチェック"""
-    return 'user' in st.session_state
+# ログイン関数
+def login(email, password):
+    try:
+        res = st.session_state.supabase.auth.sign_in_with_password({"email": email, "password": password})
+        st.session_state.user = res.user
+        st.session_state.access_token = res.session.access_token
+        # 新しいクライアントを作成してセッションを設定
+        st.session_state.supabase = create_client(
+            SUPABASE_URL,
+            SUPABASE_KEY,
+            options={"auth": {"persistSession": False}}
+        )
+        st.session_state.supabase.auth.set_session(res.session.access_token, res.session.refresh_token)
+        return True
+    except Exception as e:
+        st.error(f"ログインエラー: {str(e)}")
+        return False
+
+# サインアップ関数
+def signup(email, password):
+    try:
+        res = st.session_state.supabase.auth.sign_up({"email": email, "password": password})
+        st.success("アカウントが作成されました。メールアドレスを確認してください。")
+        
+        # 新規ユーザー用のデータを作成
+        if res.user:
+            st.session_state.supabase.table("profiles").insert({
+                "id": res.user.id,
+                "email": email,
+                "created_at": datetime.datetime.now().isoformat()
+            }).execute()
+            
+        return True
+    except Exception as e:
+        st.error(f"登録エラー: {str(e)}")
+        return False
+
+# ログアウト関数
+def logout():
+    st.session_state.supabase.auth.sign_out()
+    st.session_state.user = None
+    st.session_state.access_token = None
+    st.session_state.supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    st.rerun()
+
+#--------------------------------
+# supabase関連の関数 終了
+#--------------------------------
 
 def login_signup_page():
     #画面全体に色や背景画像を設定する
@@ -83,7 +122,7 @@ def login_signup_page():
         password = st.text_input("パスワード", type="password", key="login_password")
         if st.button("ログイン"):
             try:
-                res = sign_in(email, password)
+                res = login(email, password)
                 st.session_state.user = res.user
                 st.success("ログインに成功しました")
                 st.session_state.page = "main_page"
@@ -96,7 +135,7 @@ def login_signup_page():
         new_password = st.text_input("パスワード", type="password", key="signup_password")
         if st.button("サインアップ"):
             try:
-                res = sign_up(new_email, new_password)
+                res = signup(new_email, new_password)
                 st.success("アカウントが作成されました。メールを確認してアカウントを有効化してください。")
             except Exception as e:
                 st.error(f"サインアップに失敗しました: {str(e)}")
@@ -158,16 +197,16 @@ def main_page():
     with st.container(border=False):
         cols = st.columns(3, vertical_alignment="center")
         with cols[1]:
-            if st.button("ログアウト", use_container_width=True):
-                sign_out()
+            if st.button("ログアウト", use_container_width=True, key="logout_button"):
+                logout()
                 st.rerun()
 
+# ユーザーのログイン状態に応じてページを表示
 def main():
-    """アプリケーションのメイン処理"""
-    if not check_auth():
+    if st.session_state.user:
+        main_page()
+    else:
         login_signup_page()
-    else: main_page()
 
 if __name__ == "__main__":
-    #main()
-    main_page()
+    main()
