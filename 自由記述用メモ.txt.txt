@@ -1,1 +1,8 @@
 何かあればご自由にどうぞ
+
+よ　4/20 2:24　眠いです
+switch_page("output2")が動かなかったので、下記の通り変更しました
+st.switch_page("pages/output2.py")
+
+
+

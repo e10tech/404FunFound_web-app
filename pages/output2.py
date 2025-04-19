@@ -6,6 +6,7 @@ from streamlit_extras.switch_page_button import switch_page
 import base64
 import requests
 import os   #.envから環境設定変数を取得するために必要
+import yochanchanco as yochan
 
 #ページ設定を行う。サイトのタイトルやアイコン、画面幅を設定する
 #おそらくファイルの一番初めに記載しておかないといけないみたい
@@ -79,15 +80,15 @@ st.container(height=5, border=False)
 col1, col2, col3 = st.columns([1, 2, 1])
 with col1:
     if st.button("📖 前のページへ", use_container_width=True):
-        switch_page("output1")  # pages/output1.py に遷移する
+        st.switch_page("pages/output1.py")  # pages/output1.py に遷移する
 with col3:
     if st.button("📖 次のページへ", use_container_width=True):
-        switch_page("output3")  # pages/output3.py に遷移する
+        st.switch_page("pages/output3.py")  # pages/output3.py に遷移する
     
 with st.container():
     #画像を挿入したい時に使う
     #変数から画像を取得する
-    st.image("./picture/story2.jpg")
+    st.image("./output/1.jpeg")
 
     ##合成音声の組み込み（にじボイスAPI）
     #url = "https://api.nijivoice.com/api/platform/v1/voice-actors/294eeefe-f46c-45a6-9e5a-e6a3b3d6eb6e/generate-voice"
@@ -129,10 +130,10 @@ st.download_button(
     icon=":material/download:"
 )
 
-#特定の変数に今のページがどこかを記載しておく
-#page = 2[3枚目用]が欲しい→ハードコーディング
 #3枚目の画像を生成するコードがここに入る
-#これがGitHubのoutputフォルダに入るイメージ
+#これがGitHubのoutputフォルダに入るイメージ←githubへの入れ方分からなかった。streamlitクラウドに期待
+page = 2 # ハードコーディングでok
+yochan.make_image_stability(st.session_state.story, st.session_state.preset, page)
 
 #3枚目のにじボイスのAPIで音声を作成するコードの実行
 #これがGitHubのoutputフォルダに入るイメージ

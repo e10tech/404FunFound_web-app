@@ -79,12 +79,12 @@ st.container(height=5, border=False)
 col1, col2, col3 = st.columns([1, 2, 1])
 with col1:
     if st.button("📖 前のページへ", use_container_width=True):
-        switch_page("output3")  # pages/output2.py に遷移する
+        st.switch_page("pages/output3.py")  # pages/output2.py に遷移する
 
 with st.container():
     #画像を挿入したい時に使う
     #変換から画像を取得して下記URLに格納する
-    st.image("./picture/story4.jpg")
+    st.image("./output/3.jpeg")
 
     ##合成音声の組み込み（にじボイスAPI）
     #url = "https://api.nijivoice.com/api/platform/v1/voice-actors/294eeefe-f46c-45a6-9e5a-e6a3b3d6eb6e/generate-voice"
