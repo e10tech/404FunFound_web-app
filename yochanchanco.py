@@ -1,3 +1,5 @@
+###　mainかpage_inofoにおく
+
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
@@ -15,7 +17,7 @@ theme_options = "ファンタジー"
 preset_options = "enhance"
 
 
-
+###　絵本作るのボタンが押されたとき
 
 def make_story_gpt(sex, job, theme): # gptで物語つくる
     openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -70,7 +72,7 @@ def make_story_gpt(sex, job, theme): # gptで物語つくる
 gpted_story = make_story_gpt(sex_options, job_options, theme_options)
 
 
-
+###　絵本作るのボタンが押されたとき
 
 def make_image_prompt_gpt(story): # gptで画像生成プロンプトのパーツつくる
     openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -128,6 +130,8 @@ def make_image_prompt_gpt(story): # gptで画像生成プロンプトのパー�
 gpted_prompt_parts = make_image_prompt_gpt(gpted_story)
 
 
+###　絵本作るのボタンが押されたとき
+###　（プロンプト自体は起承転結分が全て作成されてしまうので、セッションに保存しておきたい）
 
 def concat_image_prompt(parts): # パーツをつなげて起承転結の画像生成プロンプトをつくる
 
@@ -160,11 +164,11 @@ def concat_image_prompt(parts): # パーツをつなげて起承転結の画像�
 
 merged_listed_prompts = concat_image_prompt(gpted_prompt_parts)
 
-### 受け取る！！！！！　その２（2/2）
+### 受け取る！！！！！　その２（2/2）　セッション情報にあるはずなので、頑張って受け取る
 page = 0
 
 
-
+###　ページに応じて違う画像を生成することができる　→　絵本作るのボタンで、1枚分作って、その後はどうするか悩む
 
 def make_image_stability(image_prompt_all, preset, now_page): # Stability.aiで画像つくる（いったん1枚だけ）
     stability_api_key = os.getenv("STABILITY_API_KEY")
@@ -198,6 +202,10 @@ def make_image_stability(image_prompt_all, preset, now_page): # Stability.aiで�
         raise Exception(str(response.json()))
     return f"./out/{now_page}.jpeg"
 
+
+
+
+###　この画像の受け渡し方が分からん。とりあえず/outに入る
 
 make_image_stability(merged_listed_prompts, preset_options, page)
 
