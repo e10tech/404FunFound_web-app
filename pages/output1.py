@@ -86,6 +86,7 @@ with col3:
 
 with st.container():
     #画像を挿入したい時に使う
+    #画像は変数から引っ張ってくる
     st.image("./picture/story1.jpg")
 
     ##合成音声の組み込み（にじボイスAPI）
@@ -109,19 +110,32 @@ with st.container():
     #audio_data = result['generatedVoice']['audioFileUrl']
     #st.audio(audio_data, format="audio/mp3", loop=False)
 
+    #変数から下記のURLに該当する情報を当てはめる
     st.audio(
         'https://storage.googleapis.com/ai-voice-prod-storage/platform/c37e784d-25b1-403b-a4a1-34dc6debc145/voices/2025/04/13/be119c37-225c-4e2c-8a0e-6301a751a45e/uploaded-audio.mp3?GoogleAccessId=ai-voice-api-prod-sa%40algomatic-global-ai-voice.iam.gserviceaccount.com&Expires=1744608807&Signature=mhiyIsFU5%2F0f0uoIRVIWynPVhn1mcaeYWO5m6QlELfhN6WhgsuPXjZy9bv5T%2By0Nhu9dzeIFehxX5UEdCKzxlbc3LqA5lNfs2Kx5u5pQgx3M8%2FHb%2BKRK4Luz4GI8t2ck%2By5q%2FE9GTpQxnXcd5XA0fIc2eFsPfZdhmwEowg5lpL%2Br16u%2BWokYk38ibqcDaHn9M3%2B4ANfWhnUaeWIvJGfH4F8swaf1vWKhecTrvRybk%2FustxRU8gv14vNHWIE93JUj7T6KNscTXtEK3WAgqaAPo5oUbe7qgcQe4ysd5ALAKxowpijKUJj%2BNb2InfMAZo04cvOhCKCwzG1CzZhlmuydaw%3D%3D',
         format="audio/mp3",
         loop=False
     )
     #エキスパンダーでテキストを表示
+    #テキストも変数から引っ張ってくる
     expander = st.expander("テキストを表示")
     expander.write("ぼくは　つよいきし！　みんなをまもるんだ！")
 
 #ダウンロード機能の組み込み
+#画像の名前を統一しておく必要がある
 st.download_button(
     label="Download Image",
     data="",
     file_name='book.jpg',
     icon=":material/download:"
 )
+
+#特定の変数に今のページがどこかを記載しておく
+#page = １が欲しい→ハードコーディング
+#2枚目の画像を生成するコードがここに入る
+#これがGitHubのoutputフォルダに入るイメージ
+
+#2枚目のにじボイスのAPIで音声を作成するコードの実行
+#これがGitHubのoutputフォルダに入るイメージ
+
+#次へボタンが表示されて3枚目にいけるようにする

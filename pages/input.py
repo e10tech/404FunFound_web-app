@@ -12,12 +12,13 @@ st.set_page_config(
     )
 
 #初期化(session_stateのセット)
+#空欄だとエラーが起きるので、初期値をセットしておく
 if "gender" not in st.session_state:
     st.session_state.gender = "男の子"
 
 #ページ遷移用の関数
-def go_to_page(page_name):
-    st.session_state.page = page_name
+# def go_to_page(page_name):
+#     st.session_state.page = page_name
 
 #画面全体に色や背景画像を設定する  background-color: #fcefe1;
 st.markdown(
@@ -82,6 +83,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 #名前の入力(st.session_state.name)
+#空欄だとエラーが起きるので、初期値をセットしておく
 with st.container():
     st.markdown(" <div style='text-align: center; color:#634320;'><h5>すきな名前（なまえ）をかいてね</h5></div>", unsafe_allow_html=True)
     st.text_input(label="", value="テックちゃん", placeholder="名前をいれてね", key="name", label_visibility="collapsed")
@@ -155,10 +157,39 @@ with st.container():
             )
     st.container(height=3)
 
+#st.なんとかに全部のセッション情報をいれておく
+#st.session_state.all = {
+
+#物語を作るためのボタン
+# st.markdown("""
+#                 <a href="/output1" target="_self">
+#                     <button style='font-size:18px; padding:0.5em 1em; border-radius:8px; background-color:#4CAF50; color:white; border:none; width:100%;'>
+#                         📖 準備ができたので読みに行く
+#                     </button>
+#                 </a>
+#             """, unsafe_allow_html=True)
+
+#ストーリーの作成するコードの実行
+#from yochanchanco import YochanChanko
+
+#４枚分の画像生成するためのプロンプトを生成するコードの実行（辞書型になってる）
+#セッション情報にアペンドする
+
+#特定の変数に今のページがどこかを記載しておく
+#page = 0が欲しい#→ハードコーディング
+#1枚目の画像を作るコードの実行
+#これがGitHubのoutputフォルダに入るイメージ
+#0.jpgが保存される
+
+#1枚目のストーリーを読むにじボイスのAPIで音声を作成するコードの実行
+#これがGitHubのoutputフォルダに入るイメージ
+#0.mp3が保存される
+
+#↓これはページの切り替えの動作のトリガーにする
 st.markdown("""
                 <a href="/output1" target="_self">
                     <button style='font-size:18px; padding:0.5em 1em; border-radius:8px; background-color:#4CAF50; color:white; border:none; width:100%;'>
-                        📖 作成する
+                        📖 準備ができたので読みに行く
                     </button>
                 </a>
             """, unsafe_allow_html=True)
