@@ -254,52 +254,6 @@ def main_page():
                 logout()
                 st.rerun()
 
-def input_page():
-    st.title("すきな絵本（えほん）をつくる")
-    
-    # 入力フォーム
-    title = st.text_input("タイトル", key="story_title")
-    story0 = st.text_area("1ページ目", key="story0")
-    story1 = st.text_area("2ページ目", key="story1")
-    story2 = st.text_area("3ページ目", key="story2")
-    story3 = st.text_area("4ページ目", key="story3")
-    
-    # 保存ボタン
-    if st.button("保存", key="save_story_button"):
-        if title and story0 and story1 and story2 and story3:
-            user_id = st.session_state.user.id
-            if save_story(user_id, title, story0, story1, story2, story3):
-                # 入力フィールドをクリア
-                st.session_state.story_title = ""
-                st.session_state.story0 = ""
-                st.session_state.story1 = ""
-                st.session_state.story2 = ""
-                st.session_state.story3 = ""
-                st.rerun()
-        else:
-            st.error("すべての項目を入力してください。")
-
-def render_page():
-    # ログインページは常にアクセス可能
-    if st.session_state.page == "login":
-        login_signup_page()
-        return
-
-    # その他のページはログインチェック
-    if not st.session_state.user:
-        st.warning("ログインが必要です。")
-        st.session_state.page = "login"
-        login_signup_page()
-        return
-
-    # ログイン済みの場合、各ページを表示
-    if st.session_state.page == "main":
-        main_page()
-    elif st.session_state.page == "input":
-        input_page()
-    elif st.session_state.page == "book_list":
-        st.write("本のリストページ")
-
 # ユーザーのログイン状態に応じてページを表示
 def main():
     if st.session_state.user:
