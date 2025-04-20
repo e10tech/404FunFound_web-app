@@ -179,7 +179,7 @@ if st.button("📖 絵本（えほん）をつくる", use_container_width=True)
     #1枚目のストーリーを読むにじボイスのAPIで音声を作成するコードの実行
     #これがGitHubのoutputフォルダに入るイメージ
     #0.mp3が保存される
-    ##########################################vg(st.session_state.voice, st.session_state.audio_text, page)
+    vg(st.session_state.voice, st.session_state.audio_text, page)
     
     #st.なんとかに全部のセッション情報をいれておく
     #st.session_state.all = {
