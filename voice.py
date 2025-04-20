@@ -6,12 +6,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 #にじボイスAPIで合成した音声を生成
-def voice_generated(id, audio_text, page):
+def voice_generated(id, audio_text, now_page):
     url = f"https://api.nijivoice.com/api/platform/v1/voice-actors/{id}/generate-voice"
 
     payload = {
         "format": "mp3",
-        "script": audio_text[page],
+        "script": audio_text[now_page],
         "speed": "1",
         "emotionalLevel": "0.1",
         "soundDuration": "0.1"
@@ -30,7 +30,7 @@ def voice_generated(id, audio_text, page):
     response = requests.get(download_url)
 
     #指定先(今回はoutputフォルダ)に音声データを保存voice0.mp3みたいな感じ
-    save_path = f'./output/voice{page}.mp3'
+    save_path = f'./output/voice{now_page}.mp3'
     if response.status_code == 200:
         with open(save_path, 'wb') as file:
             file.write(response.content)

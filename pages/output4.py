@@ -1,6 +1,6 @@
 import streamlit as st
-from elevenlabs import ElevenLabs, play #ElevenLabs APIの利用に必要
-from io import BytesIO  #ElevenLabsで作成した合成音声をバイト型に変換
+# from elevenlabs import ElevenLabs, play #ElevenLabs APIの利用に必要
+# from io import BytesIO  #ElevenLabsで作成した合成音声をバイト型に変換
 from dotenv import load_dotenv  #.envファイルの読み込みに必要なモジュール
 from streamlit_extras.switch_page_button import switch_page
 import base64
