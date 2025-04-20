@@ -108,7 +108,7 @@ yochan.make_image_stability(st.session_state.story, st.session_state.preset, pag
 
 #2枚目のにじボイスのAPIで音声を作成するコードの実行
 #これがGitHubのoutputフォルダに入るイメージ
-vg(st.session_state.voice, text, page)
+vg(st.session_state.voice, st.session_state.audio_text, page)
 
 #次へボタンが表示されて3枚目にいけるようにする
 st.container(height=5, border=False)
