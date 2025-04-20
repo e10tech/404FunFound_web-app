@@ -1,0 +1,14 @@
+os
+dotenv
+io
+requests
+pandas
+oepn ai
+json
+time
+
+streamlit
+streamlit_extras
+
+supabase
+elevenlabs
