@@ -1,9 +1,9 @@
 os
-
+python-dotenv
 io
 requests
 pandas
-oepn ai
+openai
 json
 time
 
