@@ -185,6 +185,6 @@ if st.button("📖 絵本（えほん）をつくる", use_container_width=True)
     #st.session_state.all = {
 
     #↓これはページの切り替えの動作のトリガーにする
-    if st.button("📖 準備ができたので読みに行く", use_container_width=True):
-        st.switch_page("pages/output1.py")  # pages/output1.py に遷移する
+if st.button("📖 準備ができたので読みに行く", use_container_width=True):
+    st.switch_page("pages/output1.py")  # pages/output1.py に遷移する
     

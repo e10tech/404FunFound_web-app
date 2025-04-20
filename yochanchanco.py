@@ -1,4 +1,4 @@
-###　mainかpage_inofoにおく
+###　mainかpage_infoにおく
 
 from openai import OpenAI
 import os
@@ -10,21 +10,43 @@ import json
 import requests # stability.ai用
 
 
-### 受け取る！！！！！　その１（1/2）
-# sex_options = "男の子"
-# job_options = "魔法使い"
-# theme_options = "ファンタジー"
-# preset_options = "enhance"
-
-
 ###　絵本作るのボタンが押されたとき
 
-def make_story_gpt(sex, job, theme): # gptで物語つくる
+def make_story_gpt(gender, job, theme):
     openai_api_key = os.getenv("OPENAI_API_KEY")
-    client = OpenAI(api_key=openai_api_key,)
+    client = OpenAI(api_key=openai_api_key)
+
+    user_content = (
+        "以下の【input条件】と【出力要件】に沿って、新しい物語を創作してください。json形式で出力してください\n"
+        "\n"
+        "【input条件】\n"
+        f"--主人公の性別：{gender}\n"
+        f"--主人公のジョブ：{job}\n"
+        f"--結末の雰囲気：{theme}\n"
+        "\n"
+        "【出力要件】\n"
+        "・登場人物は主人公と副主人公の2キャラクターのみとしてください。物語の途中で、追加のキャラクターを登場させてはいけません。\n"
+        "・人形（doll）や卵（egg）や像（statue）や鏡（mirror）は登場してはいけません。\n"
+        "・主人公と副主人公の名前に関して、「ミッキー」などの特定の物語をイメージさせるものは利用してはいけません。\n"
+        "・ネズミ（mouse）とふくろう（owl）の登場を禁止します。\n"
+        "・物語の出力は、【出力されるjson形式のサンプル】に倣って、起承転結および主人公像、副主人公像の6つに分けてください。各200字程度で、計1200字程度で記述してください。\n"
+        "・主人公と副主人公は、起承転結のそれぞれの物語に必ず登場するようにしてください。\n"
+        "・主人公と副主人公については、その外見的特徴（服装、ヘアスタイル、ヘアカラー、アイカラー、持ち物など）を含めて記述してください。\n"
+        "・主人公と副主人公に関する色の表現には、「光る」や「虹色の」など、描写が難しいものは避けてください。\n"
+        "\n"
+        "【出力されるjson形式のサンプル】\n"
+        "{\n"
+        "  \"起\": \"むかしむかし、お城の中に、ひまわり色のドレスを着たお姫さまのエミリーちゃんがくらしていました。エミリーちゃんは、ふんわり茶色のくるくる髪と、やさしいこげちゃ色の目をしています。となりにはいつも、青いリボンを巻いた、元気なうさぎのリリーちゃんがいます。リリーちゃんは、白くてふわふわの毛と、まん丸な黒い目がキラキラしています。ふたりはとても仲良しです。\",\n"
+        "  \"承\": \"ある日、エミリーちゃんとリリーちゃんは、お城のにわで虫めがねを見つけました。『これで何か探してみよう！』とエミリーちゃんが言いました。リリーちゃんは『かくれんぼの宝物が見つかるかも！』とわくわく。ふたりは大きな木の下やお花畑をのぞいて歩きます。でも、見つかるのは葉っぱや小石ばかり。もっとふしぎな物をさがして、ふたりはお庭の奥へ進んでいきました。\",\n"
+        "  \"転\": \"お庭のいちばん奥で、ふたりは小さな穴を見つけました。『虫めがねでのぞいてみよう！』とエミリーちゃん。リリーちゃんはドキドキしながらエミリーちゃんの肩にのぼります。虫めがねを通してのぞいたら、なんと奥に小さなキラキラした何かが見えます。『なにかな？』『お宝かも！』ふたりは思いきって小さな穴を広げようとしました。すると、その奥からふんわり風が吹いてきて…。\",\n"
+        "  \"結\": \"ふたりが目をとじると、なんと穴の中からは美味しそうなにんじんケーキの香りがぷ～ん！『えっ！ケーキみつけたの！？』とびっくり。嬉しくなったエミリーちゃんとリリーちゃんは、ふたりだけの小さな秘密のお部屋に入り、しあわせいっぱいケーキを食べました。まさかお庭の奥でケーキが見つかるなんて、ほんとうにびっくりの一日でした！\",\n"
+        "  \"主人公\": \"エミリーちゃんは、ひまわり色のドレスを着たやさしいお姫さまです。茶色のくるくるとした長い髪をしていて、こげちゃ色のはっきりした目が特徴。楽しいことや探検が大好きで、明るく前向きな女の子です。小さなことにもワクワクし、困っている友だちにはいつも手をさしのべます。\",\n"
+        "  \"副主人公\": \"リリーちゃんは、青いリボンを首に巻いた、元気なうさぎです。まっ白でふわふわの毛と、まん丸な黒い目がチャームポイント。エミリーちゃんのよき相棒で、明るくて好奇心いっぱい。小さい体なのに、どんなときもエミリーちゃんの冒険にいっしょうけんめい付きあってくれる大事なともだちです。\"\n"
+        "}\n"
+    )
 
     response = client.responses.create(
-        model="gpt-4.1", # gpt-4.1, gpt-4.1-mini から選ぶ
+        model="gpt-4.1",
         input=[
             {
                 "role": "system",
@@ -32,34 +54,7 @@ def make_story_gpt(sex, job, theme): # gptで物語つくる
             },
             {
                 "role": "user",
-                "content": (
-                    "以下の【input条件】と【出力要件】に沿って、新しい物語を創作してください。json形式で出力してください\n"
-                    "\n"
-                    "【input条件】\n"
-                    f"--主人公の性別：{sex}\n" # このあたりの条件はinputから変数で取得するように変更する
-                    f"--主人公のジョブ：{job}\n"
-                    f"--結末の雰囲気：{theme}\n"
-                    "\n"
-                    "【出力要件】\n"
-                    "・登場人物は主人公と副主人公の2キャラクターのみとしてください。物語の途中で、追加のキャラクターを登場させていはいけません。\n"
-                    "・人形（doll）や卵（egg）や像（statue）や鏡（mirror）は登場してはいけません。\n"
-                    "・主人公と副主人公の名前に関して、「ミッキー」などの特定の物語をイメージさせるものは利用してはいけません。\n"
-                    "・ネズミ（mouse）とふくろう（owl）の登場を禁止します。\n"
-                    "・物語の出力は、【出力されるjson形式のサンプル】に倣って、起承転結および主人公像、副主人公像の6つに分けてください。各200字程度で、計1200字程度で記述してください。\n"
-                    "・主人公と副主人公は、起承転結のそれぞれの物語に必ず登場するようにしてください。\n"
-                    "・主人公と副主人公については、その外見的特徴（服装、ヘアスタイル、ヘアカラー、アイカラー、持ち物など）を含めて記述してください。\n"
-                    "・主人公と副主人公に関する色の表現には、「光る」や「虹色の」など、描写が難しいものは避けてください。\n"
-                    "\n"
-                    "【出力されるjson形式のサンプル】\n"
-                    "{\n"
-                    "  '起': 'むかしむかし、お城の中に、ひまわり色のドレスを着たお姫さまのエミリーちゃんがくらしていました。エミリーちゃんは、ふんわり茶色のくるくる髪と、やさしいこげちゃ色の目をしています。となりにはいつも、青いリボンを巻いた、元気なうさぎのリリーちゃんがいます。リリーちゃんは、白くてふわふわの毛と、まん丸な黒い目がキラキラしています。ふたりはとても仲良しです。',\n"
-                    "  '承': 'ある日、エミリーちゃんとリリーちゃんは、お城のにわで虫めがねを見つけました。『これで何か探してみよう！』とエミリーちゃんが言いました。リリーちゃんは『かくれんぼの宝物が見つかるかも！』とわくわく。ふたりは大きな木の下やお花畑をのぞいて歩きます。でも、見つかるのは葉っぱや小石ばかり。もっとふしぎな物をさがして、ふたりはお庭の奥へ進んでいきました。',\n"
-                    "  '転': 'お庭のいちばん奥で、ふたりは小さな穴を見つけました。『虫めがねでのぞいてみよう！』とエミリーちゃん。リリーちゃんはドキドキしながらエミリーちゃんの肩にのぼります。虫めがねを通してのぞいたら、なんと奥に小さなキラキラした何かが見えます。『なにかな？』『お宝かも！』ふたりは思いきって小さな穴を広げようとしました。すると、その奥からふんわり風が吹いてきて…。',\n"
-                    "  '結': 'ふたりが目をとじると、なんと穴の中からは美味しそうなにんじんケーキの香りがぷ～ん！『えっ！ケーキみつけたの！？』とびっくり。嬉しくなったエミリーちゃんとリリーちゃんは、ふたりだけの小さな秘密のお部屋に入り、しあわせいっぱいケーキを食べました。まさかお庭の奥でケーキが見つかるなんて、ほんとうにびっくりの一日でした！',\n"
-                    "  '主人公': 'エミリーちゃんは、ひまわり色のドレスを着たやさしいお姫さまです。茶色のくるくるとした長い髪をしていて、こげちゃ色のはっきりした目が特徴。楽しいことや探検が大好きで、明るく前向きな女の子です。小さなことにもワクワクし、困っている友だちにはいつも手をさしのべます。',\n"
-                    "  '副主人公': 'リリーちゃんは、青いリボンを首に巻いた、元気なうさぎです。まっ白でふわふわの毛と、まん丸な黒い目がチャームポイント。エミリーちゃんのよき相棒で、明るくて好奇心いっぱい。小さい体なのに、どんなときもエミリーちゃんの冒険にいっしょうけんめい付きあってくれる大事なともだちです。'\n"
-                    "}"
-                )
+                "content": user_content
             }
         ]
     )
@@ -69,17 +64,46 @@ def make_story_gpt(sex, job, theme): # gptで物語つくる
 
 
 
-### gpted_story = make_story_gpt(sex_options, job_options, theme_options)
-
-
 ###　絵本作るのボタンが押されたとき
 
-def make_image_prompt_gpt(story): # gptで画像生成プロンプトのパーツつくる
+def make_image_prompt_gpt(story):
     openai_api_key = os.getenv("OPENAI_API_KEY")
-    client = OpenAI(api_key=openai_api_key,)
+    client = OpenAI(api_key=openai_api_key)
+
+    user_content = (
+        "以下の【story】をベースにして、英語で、画像生成プロンプトのパーツを作成してください。【画像生成プロンプトの注意事項】は必ず順守してください。json形式で出力してください\n"
+        "\n"
+        "【story】\n"
+        f"{story}\n"
+        "\n"
+        "【画像生成プロンプトの注意事項】\n"
+        "・Subject_Depiction_起、Subject_Depiction_承、Subject_Depiction_転、Subject_Depiction_結については、それぞれ16words以内で考えてください。最初に、「scene:」を宣言してください。また、main_Characterとsub_Characterの名前を含め、main_Characterとsub_Characterの行動や状態を端的に記述してください。\n"
+        "・main_Character_Traits、sub_Character_Traitsについては、それぞれ17words以内で考えてください。最初に、主人公格（main-Protagonist: かsub-Protagonist: ）と名前を宣言してください。その後、人物像（動物像）を端的に表現し、続いて外見的特徴（服装、ヘアスタイル、ヘアカラー、アイカラー、小物など）を中心に記述してください。\n"
+        "・Artistic_Styleは、watercolor styleがおススメです。より適当なものがあれば、そちらを採用してください。\n"
+        "・Color_Paletteは、soft pastel toneがおススメです。より適当なものがあれば、そちらを採用してください。\n"
+        "・Background_起、Background_承、Background_転、Background_結については、それぞれ10words以内で考えてください。全体の世界観を維持しつつ、各物語に適した背景の状態や雰囲気を記述してください。\n"
+        "\n"
+        "【出力されるjson形式のサンプル】\n"
+        "{\n"
+        "  \"Artistic_Style\": \"watercolor style\",\n"
+        "  \"Lighting\": \"bright and gentle daylight\",\n"
+        "  \"Color_Palette\": \"soft pastel tone\",\n"
+        "  \"Subject_Depiction_起\": \"Princess Emily in sunflower dress with Lily, the blue-ribboned white rabbit\",\n"
+        "  \"Subject_Depiction_承\": \"Emily and Lily excited, exploring castle garden with magnifying glass\",\n"
+        "  \"Subject_Depiction_転\": \"Emily peers into tiny hole, Lily on shoulder, magical sparkles beyond\",\n"
+        "  \"Subject_Depiction_結\": \"Emily and Lily joyful in hidden room, sharing carrot cake together\",\n"
+        "  \"main_Character_Traits\": \"main-Protagonist: Leo – a small prince with short golden hair, vivid blue eyes, tidy royal attire and a flowing red cape\",\n"
+        "  \"sub_Character_Traits\": \"sub-Protagonist: Tino – a cute little grey mouse with pink ears, a thick tail and a bright yellow scarf fluttering playfully\",\n"
+        "  \"Background_起\": \"bright castle interior, sunlight through grand windows\",\n"
+        "  \"Background_承\": \"lush castle garden with old trees, blooming flowers everywhere\",\n"
+        "  \"Background_転\": \"shaded garden corner, mysterious tiny hole near old roots\",\n"
+        "  \"Background_結\": \"cozy secret room, softly lit, table set with carrot cake\",\n"
+        "  \"Composition\": \"storybook-inspired, clear character focus, gentle whimsical touch\"\n"
+        "}\n"
+    )
 
     response = client.responses.create(
-        model="gpt-4.1", # gpt-4.1, gpt-4.1-mini から選ぶ
+        model="gpt-4.1",
         input=[
             {
                 "role": "system",
@@ -87,56 +111,45 @@ def make_image_prompt_gpt(story): # gptで画像生成プロンプトのパー�
             },
             {
                 "role": "user",
-                "content": (
-                    "以下の【story】をベースにして、英語で、画像生成プロンプトのパーツを作成してください。【画像生成プロンプトの注意事項】は必ず順守してください。json形式で出力してください\n"
-                    "\n"
-                    "【story】\n"
-                    f"{story}\n"
-                    "\n"
-                    "【画像生成プロンプトの注意事項】\n"
-                    "・Subject_Depiction_起、Subject_Depiction_承'、Subject_Depiction_転、Subject_Depiction_結については、それぞれ16words以内で考えてください。最初に、「scene:」を宣言してください。また、main_Characterとsub_Characterの名前を含め、main_Characterとsub_Characterの行動や状態を端的に記述してください。\n"
-                    "・main_Character_Traits、sub_Character_Traitsについては、それぞれ17words以内で考えてください。最初に、主人公格（main-Protagonist: かsub-Protagonist: ）と名前を宣言してください。その後、人物像（動物像）を端的に表現し、続いて外見的特徴（服装、ヘアスタイル、ヘアカラー、アイカラー、小物など）を中心に記述してください。\n"
-                    "・Artistic_Styleは、watercolor styleがおススメです。より適当なものがあれば、そちらを採用してください。\n"
-                    "・Color_Paletteは、soft pastel toneがおススメです。より適当なものがあれば、そちらを採用してください。\n"
-                    "・Background_起、Background_承、Background_転、Background_結については、それぞれ10words以内で考えてください。全体の世界観を維持しつつ、各物語に適した背景の状態や雰囲気を記述してください。\n"
-                    "\n"
-                    "【出力されるjson形式のサンプル】\n"
-                    "{{\n"
-                    "  'Artistic_Style': 'watercolor style',\n"
-                    "  'Lighting': 'bright and gentle daylight,\n"
-                    "  'Color_Palette': 'soft pastel tone',\n"
-                    "  'Subject_Depiction_起': 'Princess Emily in sunflower dress with Lily, the blue-ribboned white rabbit',\n"
-                    "  'Subject_Depiction_承': 'Emily and Lily excited, exploring castle garden with magnifying glass',\n"
-                    "  'Subject_Depiction_転': 'Emily peers into tiny hole, Lily on shoulder, magical sparkles beyond',\n"
-                    "  'Subject_Depiction_結': 'Emily and Lily joyful in hidden room, sharing carrot cake together',\n"
-                    "  'main_Character_Traits': 'main-Protagonist: Leo – a small prince with short golden hair, vivid blue eyes, tidy royal attire and a flowing red cape',\n"
-                    "  'sub_Character_Traits': 'sub-Protagonist: Tino – a cute little grey mouse with pink ears, a thick tail and a bright yellow scarf fluttering playfully',\n"
-                    "  'Background_起': 'bright castle interior, sunlight through grand windows',\n"
-                    "  'Background_承': 'lush castle garden with old trees, blooming flowers everywhere',\n"
-                    "  'Background_転': 'shaded garden corner, mysterious tiny hole near old roots',\n"
-                    "  'Background_結': 'cozy secret room, softly lit, table set with carrot cake',\n"
-                    "  'Composition': 'storybook-inspired, clear character focus, gentle whimsical touch',\n"
-                    "}}"
-                )
+                "content": user_content
             }
         ]
     )
-    
+
     parts = json.loads(response.output_text)
     return parts
 
 
-### gpted_prompt_parts = make_image_prompt_gpt(gpted_story)
-
 
 ###　絵本作るのボタンが押されたとき
 
-def make_audio_text_gpt(story):  # gptでナレーション用のテキストつくる
+def make_audio_text_gpt(story):
     openai_api_key = os.getenv("OPENAI_API_KEY")
     client = OpenAI(api_key=openai_api_key)
 
+    user_content = (
+        "以下の【story】をベースにして、起承転結の各物語に沿ったナレーション用のテキスト（計4つ）を作成してください。【注意事項】は必ず順守してください。json形式で出力してください。\n"
+        f"{story}\n"
+        "\n"
+        "【注意事項】\n"
+        "・ひらがなと句読点だけを用いること\n"
+        "・難解な言い回しや単語は使わないこと\n"
+        "・40字～60字におさめること\n"
+        "・物語の情景や主人公らの行動に沿っていること\n"
+        "・楽しい言い回しや興味をひくような表現を含んでいること\n"
+        "・セリフについてはセリフであることが分かるようにナレーションすること\n"
+        "\n"
+        "【出力されるjson形式のサンプル】\n"
+        "{\n"
+        "  \"起\": \"ひまわりいろのえみりーちゃんとりりーちゃんはおしろでにこにこくらして、いつもなかよしでした。\",\n"
+        "  \"承\": \"『これでたからさがしだよ』えみりーちゃん。りりーちゃんも『やったー』とおにわをわくわくあるきました。\",\n"
+        "  \"転\": \"おくのちいさなあなをのぞくときらきらひかるもの！えみりーちゃん『おたからかも』りりーちゃんはどきどきしました。\",\n"
+        "  \"結\": \"ふわっとあまいにんじんけーきのかおり！『いただきまーす』ふたりはひみつのおへやでけーきをもりもりたべてにっこり。\"\n"
+        "}\n"
+    )
+
     response = client.responses.create(
-        model="gpt-4.1",  # gpt-4.1, gpt-4.1-mini から選ぶ
+        model="gpt-4.1",
         input=[
             {
                 "role": "system",
@@ -144,42 +157,18 @@ def make_audio_text_gpt(story):  # gptでナレーション用のテキストつ
             },
             {
                 "role": "user",
-                "content": (
-                    "以下の【story】をベースにして、起承転結の各物語に沿ったナレーション用のテキスト（計4つ）を作成してください。【注意事項】は必ず順守してください。json形式で出力してください。\n\n"
-                    "【注意事項】\n"
-                    "・ひらがなと句読点だけを用いること\n"
-                    "・難解な言い回しや単語は使わないこと\n"
-                    "・40字～60字におさめること\n"
-                    "・物語の情景や主人公らの行動に沿っていること\n"
-                    "・楽しい言い回しや興味をひくような表現を含んでいること\n"
-                    "・セリフについてはセリフであることが分かるようにナレーションすること\n\n"
-                    "【出力されるjson形式のサンプル】\n"
-                    "{\n"
-                    "  \"起\": \"ひまわりいろのえみりーちゃんとりりーちゃんはおしろでにこにこくらして、いつもなかよしでした。\",\n"
-                    "  \"承\": \"『これでたからさがしだよ』えみりーちゃん。りりーちゃんも『やったー』とおにわをわくわくあるきました。\",\n"
-                    "  \"転\": \"おくのちいさなあなをのぞくときらきらひかるもの！えみりーちゃん『おたからかも』りりーちゃんはどきどきしました。\",\n"
-                    "  \"結\": \"ふわっとあまいにんじんけーきのかおり！『いただきまーす』ふたりはひみつのおへやでけーきをもりもりたべてにっこり。\"\n"
-                    "}"
-                )
+                "content": user_content
             }
         ]
     )
 
     audio_text = json.loads(response.output_text)
+    return [audio_text["起"], audio_text["承"], audio_text["転"], audio_text["結"]]
 
-    audio_text_起 = audio_text["起"]
-    audio_text_承 = audio_text["承"]
-    audio_text_転 = audio_text["転"]
-    audio_text_結 = audio_text["結"]
-    audio_text_all= [audio_text_起, audio_text_承, audio_text_転, audio_text_結]
-
-    return audio_text_all
-
-### gpted_audio_text = make_audio_text_gpt(gpted_story)
 
 
 ###　絵本作るのボタンが押されたとき
-###　（プロンプト自体は起承転結分が全て作成されてしまうので、セッションに保存しておきたい）
+###　セッションに受け渡す必要あり
 
 def concat_image_prompt(parts): # パーツをつなげて起承転結の画像生成プロンプトをつくる
 
@@ -210,15 +199,10 @@ def concat_image_prompt(parts): # パーツをつなげて起承転結の画像�
     return image_prompt_all
 
 
-### merged_listed_prompts = concat_image_prompt(gpted_prompt_parts)
 
-### 受け取る！！！！！　その２（2/2）　セッション情報にあるはずなので、頑張って受け取る
-# page = 0
+###　ページに応じて違う画像を生成することができる
 
-
-###　ページに応じて違う画像を生成することができる　→　絵本作るのボタンで、1枚分作って、その後はどうするか悩む
-
-def make_image_stability(image_prompt_all, preset, now_page): # Stability.aiで画像つくる（いったん1枚だけ）
+def make_image_stability(image_prompt_all, preset, now_page): # Stability.aiで1枚ずつ画像つくる
     stability_api_key = os.getenv("STABILITY_API_KEY")
     
     image_prompt = image_prompt_all[now_page]
@@ -249,11 +233,4 @@ def make_image_stability(image_prompt_all, preset, now_page): # Stability.aiで�
     else:
         raise Exception(str(response.json()))
     return f"./output/{now_page}.jpeg"
-
-
-
-
-###　この画像の受け渡し方が分からん。とりあえず/outに入る
-
-### make_image_stability(merged_listed_prompts, preset_options, page)
 
