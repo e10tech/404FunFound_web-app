@@ -7,6 +7,7 @@ import base64
 import requests
 import os   #.envから環境設定変数を取得するために必要
 import yochanchanco as yochan
+from voice import voice_generated as vg
 
 #ページ設定を行う。サイトのタイトルやアイコン、画面幅を設定する
 #おそらくファイルの一番初めに記載しておかないといけないみたい
@@ -74,42 +75,11 @@ with col3:
                     </button>
                 </a>
             """, unsafe_allow_html=True)
-
-st.container(height=5, border=False)
-
-col1, col2, col3 = st.columns([1, 2, 1])
-with col1:
-    if st.button("📖 前のページへ", use_container_width=True):
-        st.switch_page("pages/output1.py")  # pages/output1.py に遷移する
-with col3:
-    if st.button("📖 次のページへ", use_container_width=True):
-        st.switch_page("pages/output3.py")  # pages/output3.py に遷移する
     
 with st.container():
     #画像を挿入したい時に使う
     #変数から画像を取得する
     st.image("./output/1.jpeg")
-
-    ##合成音声の組み込み（にじボイスAPI）
-    #url = "https://api.nijivoice.com/api/platform/v1/voice-actors/294eeefe-f46c-45a6-9e5a-e6a3b3d6eb6e/generate-voice"
-
-    #payload = {
-    #    "format": "mp3",
-    #    "script": "ある日夜空に光る星たちと、おりがみの花に囲まれて、ルナはそっと願いごとをささやいた。「いつか、星の国に行けますように…」",
-    #    "speed": "1",
-    #    "emotionalLevel": "0.1",
-    #    "soundDuration": "0.1"
-    #}
-    #headers = {
-    #    "accept": "application/json",
-    #    "x-api-key": os.getenv("x-api-key"),
-    #    "content-type": "application/json"
-    #}
-    #response = requests.post(url, json=payload, headers=headers)
-
-    #result = response.json()
-    #audio_data = result['generatedVoice']['audioFileUrl']
-    #st.audio(audio_data, format="audio/mp3", loop=False)
 
     #音声合成を変数からもってくる
     st.audio(
@@ -137,5 +107,15 @@ yochan.make_image_stability(st.session_state.story, st.session_state.preset, pag
 
 #3枚目のにじボイスのAPIで音声を作成するコードの実行
 #これがGitHubのoutputフォルダに入るイメージ
+vg(st.session_state.voice, text, page)
 
 #次へボタンが表示されて3枚目にいけるようにする
+st.container(height=5, border=False)
+
+col1, col2, col3 = st.columns([1, 2, 1])
+#with col1:
+#    if st.button("📖 前のページへ", use_container_width=True):
+#        st.switch_page("pages/output1.py")  # pages/output1.py に遷移する
+with col3:
+    if st.button("📖 次のページへ", use_container_width=True):
+        st.switch_page("pages/output3.py")  # pages/output3.py に遷移する

@@ -21,11 +21,15 @@ def voice_generated(id, text, page):
         "x-api-key": os.getenv("x-api-key"),
         "content-type": "application/json"
     }
+    # にじボイスAPIにリクエスト送信
     response = requests.post(url, json=payload, headers=headers)
     result = response.json()
-
-    response = requests.get(download_url)
+    
+    #resultのaudioFileDownloadUrlにある音声データを取得
     download_url = result['generatedVoice']['audioFileDownloadUrl']
+    response = requests.get(download_url)
+
+    #指定先(今回はoutputフォルダ)に音声データを保存voice0.mp3みたいな感じ
     save_path = f'./output/voice{page}.mp3'
     if response.status_code == 200:
         with open(save_path, 'wb') as file:
