@@ -1,14 +1,8 @@
-
 python-dotenv
-
 requests
 pandas
 openai
-
-
-
 streamlit
 streamlit_extras
-
 supabase
 elevenlabs
