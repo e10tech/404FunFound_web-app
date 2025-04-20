@@ -230,21 +230,12 @@ def main_page():
         left, center, right = st.columns([1, 3, 1], vertical_alignment="center")
         with center:
             st.container(height=40, border=False)
-            st.markdown("""
-                <a href="/input" target="_self">
-                    <button style='font-size:18px; padding:0.5em 1em; border-radius:8px; background-color:#4CAF50; color:white; border:none; width:100%;'>
-                        📖 すきな絵本（えほん）をつくる
-                    </button>
-                </a>
-            """, unsafe_allow_html=True)
+            if st.button("📖 すきな絵本（えほん）をつくる", use_container_width=True, key="create_book"):
+                print("Debug - Before transition:", st.session_state)
+                st.switch_page("pages/input.py")
             st.container(height=20, border=False)
-            st.markdown("""
-                <a href="/book_list" target="_self">
-                    <button style='font-size:18px; padding:0.5em 1em; border-radius:8px; background-color:#4CAF50; color:white; border:none; width:100%;'>
-                        📖 むかしの本（ほん）からつくる
-                    </button>
-                </a>
-            """, unsafe_allow_html=True)
+            if st.button("📖 むかしの本（ほん）からつくる", use_container_width=True, key="create_from_old"):
+                st.switch_page("pages/book_list.py")
             st.container(height=40, border=False)
 
     with st.container(border=False):
