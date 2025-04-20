@@ -126,8 +126,56 @@ def make_image_prompt_gpt(story): # gptで画像生成プロンプトのパー�
     return parts
 
 
-
 ### gpted_prompt_parts = make_image_prompt_gpt(gpted_story)
+
+
+###　絵本作るのボタンが押されたとき
+
+def make_audio_text_gpt(story):  # gptでナレーション用のテキストつくる
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+    client = OpenAI(api_key=openai_api_key)
+
+    response = client.responses.create(
+        model="gpt-4.1",  # gpt-4.1, gpt-4.1-mini から選ぶ
+        input=[
+            {
+                "role": "system",
+                "content": "あなたはプロフェッショナルな3歳児向けの絵本作家です。要件に沿って、物語に合ったナレーション用のテキストを作成してください。3歳児に分かるような簡単な言葉を使ってください。"
+            },
+            {
+                "role": "user",
+                "content": (
+                    "以下の【story】をベースにして、起承転結の各物語に沿ったナレーション用のテキスト（計4つ）を作成してください。【注意事項】は必ず順守してください。json形式で出力してください。\n\n"
+                    "【注意事項】\n"
+                    "・ひらがなと句読点だけを用いること\n"
+                    "・難解な言い回しや単語は使わないこと\n"
+                    "・40字～60字におさめること\n"
+                    "・物語の情景や主人公らの行動に沿っていること\n"
+                    "・楽しい言い回しや興味をひくような表現を含んでいること\n"
+                    "・セリフについてはセリフであることが分かるようにナレーションすること\n\n"
+                    "【出力されるjson形式のサンプル】\n"
+                    "{\n"
+                    "  \"起\": \"ひまわりいろのえみりーちゃんとりりーちゃんはおしろでにこにこくらして、いつもなかよしでした。\",\n"
+                    "  \"承\": \"『これでたからさがしだよ』えみりーちゃん。りりーちゃんも『やったー』とおにわをわくわくあるきました。\",\n"
+                    "  \"転\": \"おくのちいさなあなをのぞくときらきらひかるもの！えみりーちゃん『おたからかも』りりーちゃんはどきどきしました。\",\n"
+                    "  \"結\": \"ふわっとあまいにんじんけーきのかおり！『いただきまーす』ふたりはひみつのおへやでけーきをもりもりたべてにっこり。\"\n"
+                    "}"
+                )
+            }
+        ]
+    )
+
+    audio_text = json.loads(response.output_text)
+
+    audio_text_起 = audio_text["起"]
+    audio_text_承 = audio_text["承"]
+    audio_text_転 = audio_text["転"]
+    audio_text_結 = audio_text["結"]
+    audio_text_all= [audio_text_起, audio_text_承, audio_text_転, audio_text_結]
+
+    return audio_text_all
+
+### gpted_audio_text = make_audio_text_gpt(gpted_story)
 
 
 ###　絵本作るのボタンが押されたとき

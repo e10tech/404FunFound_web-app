@@ -165,6 +165,8 @@ with st.container():
 #物語を作るためのボタン
 if st.button("📖 絵本（えほん）をつくる", use_container_width=True):
     gpted_story = yochan.make_story_gpt(st.session_state.gender, st.session_state.job, st.session_state.theme)
+    gpted_audio_text = yochan.make_audio_text_gpt(gpted_story)
+    st.session_state.audio_text = gpted_audio_text
     gpted_prompt_parts = yochan.make_image_prompt_gpt(gpted_story)
     merged_listed_prompts = yochan.concat_image_prompt(gpted_prompt_parts)
     page = 0 # ハードコーディングでok
@@ -177,7 +179,7 @@ if st.button("📖 絵本（えほん）をつくる", use_container_width=True)
     #1枚目のストーリーを読むにじボイスのAPIで音声を作成するコードの実行
     #これがGitHubのoutputフォルダに入るイメージ
     #0.mp3が保存される
-    vg(st.session_state.voice, text, page)
+    ##########################################vg(st.session_state.voice, st.session_state.audio_text, page)
     
     #st.なんとかに全部のセッション情報をいれておく
     #st.session_state.all = {
