@@ -6,6 +6,7 @@ from streamlit_extras.switch_page_button import switch_page
 import base64
 import requests
 import os   #.envから環境設定変数を取得するために必要
+import time
 
 #ページ設定を行う。サイトのタイトルやアイコン、画面幅を設定する
 #おそらくファイルの一番初めに記載しておかないといけないみたい
@@ -136,15 +137,42 @@ selected = st.feedback("stars")
 #候補→ID,名前、性別、物語のテイスト、画風、なりたい職業、フィードバックの点数、起承転結別のテキスト情報、だった気がする
 #いけるなら画像を保存する
 
-#supabase上に保存するコードを実行する
-# 保存ボタン
-if st.button("保存", key="save_story_button"):
-    try:
-        success = save_story(user_id, title, story0, story1, story2, story3)
-        if success:
-            st.success("ストーリーを保存しました！")
-            st.rerun()
-        else:
-            st.error("ストーリーの保存に失敗しました。")
-    except Exception as e:
-        st.error(f"エラーが発生しました: {str(e)}")
+#保存ボタン
+if st.button("📖 おはなしを保存する", key="save_story_button"):
+    if not st.session_state.get("user"):  # ユーザーがログインしていない場合
+        st.warning("おはなしを保存するには、ログインが必要です。")
+        if st.button("ログインページへ"):
+            switch_page("main")
+    else:  # ユーザーがログインしている場合
+        try:
+            # ストーリーデータの準備
+            story_texts = {
+                0: st.session_state.audio_text[0],
+                1: st.session_state.audio_text[1],
+                2: st.session_state.audio_text[2],
+                3: st.session_state.audio_text[3]
+            }
+
+            # データベースに保存
+            from database import save_story
+            try:
+                saved_story = save_story(
+                    user_id=st.session_state.user.id,
+                    title=f"{st.session_state.name}の{st.session_state.job}物語",
+                    character_name=st.session_state.name,
+                    gender=st.session_state.gender,
+                    job=st.session_state.job,
+                    theme=st.session_state.theme,
+                    story_texts=story_texts
+                )
+                
+                if saved_story:
+                    st.success("おはなしを保存できました！")
+                    st.balloons()  # 保存成功時に祝福の演出を追加
+                else:
+                    st.error("おはなしの保存に失敗しました。必要な情報が不足している可能性があります。")
+            except Exception as e:
+                st.error(f"ストーリーの保存に失敗しました: {str(e)}")
+        except Exception as e:
+            st.error(f"エラーが発生しました: {str(e)}")
+            st.info("もう一度試してみてください。問題が解決しない場合は、管理者にお問い合わせください。")
