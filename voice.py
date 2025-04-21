@@ -18,7 +18,7 @@ def voice_generated(id, audio_text, now_page):
     }
     headers = {
         "accept": "application/json",
-        "x-api-key": os.getenv("x-api-key"),
+        "x_api_key": os.getenv("x_api_key"),
         "content-type": "application/json"
     }
     # にじボイスAPIにリクエスト送信
