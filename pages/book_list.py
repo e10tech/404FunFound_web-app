@@ -23,11 +23,11 @@ load_dotenv()
 #         layout="wide",
 #     )
 
-"""
-ここ追加してます
-このページ中に起承転結ストーリー
-1枚目画像、1枚目音声をつくるために必要
-"""
+
+#ここ追加してます
+#このページ中に起承転結ストーリー
+#1枚目画像、1枚目音声をつくるために必要
+
 
 #APIキーの取得→openaiのAPIキー
 openai_api_key = os.getenv('OPENAI_API_KEY')
@@ -47,10 +47,10 @@ if x_api_key is None:
     print("Error: X_API_KEY is not set in the environment variables.")
     sys.exit(1)
 
-"""
-ここ追加してます
-まずは空のセッションステートを定義
-"""
+
+#ここ追加してます
+#まずは空のセッションステートを定義
+
 # アプリの早い段階でセッション変数を初期化
 if "book_selected" not in st.session_state:
     st.session_state.book_selected = None  # または適切なデフォルト値
@@ -141,9 +141,9 @@ for i, name in enumerate(title_list):
         st.image(image_list[i], use_container_width=True)
         st.write(brief_list[i])
 
-"""
-選択した物語を記憶しておく
-"""
+
+#選択した物語を記憶しておく
+
 df_select = df[df['書籍タイトル_日'] == st.session_state.book_selected]
 
 # st.container(height=10, border=False)

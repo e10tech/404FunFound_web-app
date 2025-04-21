@@ -1,7 +1,6 @@
-"""
-共通で読み込む処理
-一応環境変数もここで読み込むようにしている
-"""
+###共通で読み込む処理
+###一応環境変数もここで読み込むようにしている
+
 
 #各種ライブラリのインポート
 from openai import OpenAI
@@ -36,14 +35,14 @@ if x_api_key is None:
 
 
 
-"""
-起承転結のストーリーを生成する関数。
-chapter_text: 対象となるチャプターの本文（1万字程度）
-openai_api_key: OpenAI APIキー
-return: ストーリーを辞書形式で返す（起・承・転・結・原作）
-ここはトークンの消費でかいのでやりすぎないように注意
-storyという辞書型の変数もoutput.pyに必要→そこにreturnする
-"""
+
+#起承転結のストーリーを生成する関数。
+#chapter_text: 対象となるチャプターの本文（1万字程度）
+#openai_api_key: OpenAI APIキー
+#return: ストーリーを辞書形式で返す（起・承・転・結・原作）
+#ここはトークンの消費でかいのでやりすぎないように注意
+#storyという辞書型の変数もoutput.pyに必要→そこにreturnする
+
 #ここで重要なのはchapter_textという変数にcsvファイルから読み込んだチャプターの本文を入れること。
 def make_story(chapter_text: str, openai_api_key: str) -> list:
     # OpenAI APIはすでにインポートされているはず
@@ -87,10 +86,10 @@ def make_story(chapter_text: str, openai_api_key: str) -> list:
     try:
         story = json.loads(response.output_text)
         required_keys = ["起", "承", "転", "結", "原作"]
-        if all(key in story for key in required_keys):
-            st.write("ストーリーが正しく生成されました。")
-        else:
-            st.write("ストーリーに必要なキーが不足しています。")
+        # if all(key in story for key in required_keys):
+        #     #st.write("ストーリーが正しく生成されました。")
+        # else:
+        #     #st.write("ストーリーに必要なキーが不足しています。")
 
     except json.JSONDecodeError as e:
         st.write("JSONのデコードに失敗しました。")
@@ -112,10 +111,10 @@ def make_story(chapter_text: str, openai_api_key: str) -> list:
 
 
 
-"""
-画像生成AIの個別に受け渡すプロンプトを生成する関数
-起承転結一気につくりリストに格納する
-"""
+
+#画像生成AIの個別に受け渡すプロンプトを生成する関数
+#起承転結一気につくりリストに格納する
+
 #ここで重要なのはstoryという変数からstory[起]を抽出し受け渡すこと
 def make_image_prompt_gpt(story: list, openai_api_key: str) -> list:
     # OpenAI APIはすでにインポートされているはず
@@ -177,11 +176,11 @@ def make_image_prompt_gpt(story: list, openai_api_key: str) -> list:
 
 
 
-"""
-画像生成を行う関数
-ここで重要なのはimage_promptsから必要なプロンプトを抜き出すこと
-now_pageはページ数を指定する変数→output(x)_scrapのコードに記載が必要
-"""
+
+#画像生成を行う関数
+#ここで重要なのはimage_promptsから必要なプロンプトを抜き出すこと
+#now_pageはページ数を指定する変数→output(x)_scrapのコードに記載が必要
+
 
 def generate_image(image_prompts: list, now_page: int):
     stability_api_key = os.getenv("STABILITY_API_KEY")
@@ -246,202 +245,202 @@ def generate_image(image_prompts: list, now_page: int):
 
 
 
-"""
-起のストーリー用の画像生成プロンプトを生成する関数。
-image_prompt_1という変数に文字列が格納される。
-output1_scrapにimage_promptsというリストが必要
-"""
-#ここで重要なのはstoryという変数からstory[起]を抽出し受け渡すこと
-def make_prompt_1(story: dict, openai_api_key: str, image_prompts) -> str:
-    # OpenAI APIはすでにインポートされているはず
-    #openai_api_key = os.getenv("OPENAI_API_KEY")
-    client = OpenAI(api_key=openai_api_key)
+# """
+# 起のストーリー用の画像生成プロンプトを生成する関数。
+# image_prompt_1という変数に文字列が格納される。
+# output1_scrapにimage_promptsというリストが必要
+# """
+# #ここで重要なのはstoryという変数からstory[起]を抽出し受け渡すこと
+# def make_prompt_1(story: dict, openai_api_key: str, image_prompts) -> str:
+#     # OpenAI APIはすでにインポートされているはず
+#     #openai_api_key = os.getenv("OPENAI_API_KEY")
+#     client = OpenAI(api_key=openai_api_key)
 
-    # GPTへのリクエスト
-    response = client.responses.create(
-        model="gpt-4o-mini",  # コスパ重視モデル！精度欲しいならgpt-4.1でもOK
-        input=[
-            {
-                "role": "system",
-                "content": "あなたはStable Diffusion3.5で３歳～５歳用の絵本に相応しいイラストをつくるプロフェッショナルです。"
-            },
-            {
-                "role": "user",
-                "content": (
-                    "以下は、3歳〜低学年向け絵本の1シーンに相当するストーリーです\n"
-                    "ストーリーをもとに、Stability AIで絵本風のやさしいイラストを生成するためのプロンプトを考えてください\n"
-                    "条件：\n"
-                    "・画風は「明るくかわいらしい絵本風」\n"
-                    "・主人公がどういう姿かも補足してください\n"
-                    "・プロンプトは英語で書いてください\n"
-                    "・ファンタジーすぎず、子供が見て安心できるイメージにしてください\n"
-                    "・アートスタイルは「storybook illustration」\n"
-                    "・髪色、目の色、服、年齢のプロンプトは必ず最初の方に記載してください\n"
-                    "・以下のような形式を参考にしてください：\n"
-                    "出力形式（例）：\n"
-                    "a young girl with blonde hair wearing a blue dress, smiling in a flower garden, soft pastel colors, storybook illustration, children's picture book style, wide view, gentle lighting"
-                    "プロンプトをこの形式だけで返してください。\n"
-                    f"【ストーリー】：\n{story['起']}\n"
-                )
-            }
-        ]
-    )
-    # 画像生成に受け渡すためのプロンプトをimage_prompt_1に格納
-    #ストリームリット実装時はst.set_state(～～～)に格納する
-    image_prompt = response.output_text
-    image_prompts.append(image_prompt)  # image_prompt_1をリストに追加
-    return image_prompts
-    #これをsession_stateに格納して保存されるようにする
-
-
-
-"""
-承のストーリー用の画像生成プロンプトを生成する関数。
-「起」に追加して見た目情報の継承もプロンプトとして入れておく
-image_promptsというリストに新たに格納される。
-"""
-#ここで重要なのはstoryという変数からstory[起]を抽出し受け渡すこと
-def make_prompt_2(story: dict, openai_api_key: str, image_prompts) -> str:
-    # OpenAI APIはすでにインポートされているはず
-    #openai_api_key = os.getenv("OPENAI_API_KEY")
-    client = OpenAI(api_key=openai_api_key)
-
-    # GPTへのリクエスト
-    response = client.responses.create(
-        model="gpt-4o-mini",  # コスパ重視モデル！精度欲しいならgpt-4.1でもOK
-        input=[
-            {
-                "role": "system",
-                "content": "あなたはStable Diffusion3.5で３歳～５歳用の絵本に相応しいイラストをつくるプロフェッショナルです。"
-            },
-            {
-                "role": "user",
-                "content": (
-                    "以下は、3歳〜低学年向け絵本の1シーンに相当するストーリーです\n"
-                    "前ページでは下記の画像生成プロンプトを使用しました。登場キャラクターの髪型や服装などビジュアル情報は引き継いでください。\n"
-                    f"前ページプロンプト：\n{image_prompts[0]}\n"
-                    "ストーリーをもとに、Stability AIで絵本風のやさしいイラストを生成するためのプロンプトを考えてください\n"
-                    "条件：\n"
-                    "・画風は「明るくかわいらしい絵本風」\n"
-                    "・主人公がどういう姿かも補足してください\n"
-                    "・プロンプトは英語で書いてください\n"
-                    "・ファンタジーすぎず、子供が見て安心できるイメージにしてください\n"
-                    "・アートスタイルは「storybook illustration」\n"
-                    "・髪色、目の色、服、年齢のプロンプトは必ず最初の方に記載してください\n"
-                    "・以下のような形式を参考にしてください：\n"
-                    "出力形式（例）：\n"
-                    "a young girl with blonde hair wearing a blue dress, smiling in a flower garden, soft pastel colors, storybook illustration, children's picture book style, wide view, gentle lighting"
-                    "プロンプトをこの形式だけで返してください。\n"
-                    f"【ストーリー】：\n{story['承']}\n"
-                )
-            }
-        ]
-    )
-    # 画像生成に受け渡すためのプロンプトをimage_prompt_2に格納
-    #ストリームリット実装時はst.set_state(～～～)に格納する
-    image_prompt = response.output_text
-    image_prompts.append(image_prompt)  # image_prompt_2をリストに追加
-    return image_prompts
-    #これをsession_stateに格納して保存されるようにする
+#     # GPTへのリクエスト
+#     response = client.responses.create(
+#         model="gpt-4o-mini",  # コスパ重視モデル！精度欲しいならgpt-4.1でもOK
+#         input=[
+#             {
+#                 "role": "system",
+#                 "content": "あなたはStable Diffusion3.5で３歳～５歳用の絵本に相応しいイラストをつくるプロフェッショナルです。"
+#             },
+#             {
+#                 "role": "user",
+#                 "content": (
+#                     "以下は、3歳〜低学年向け絵本の1シーンに相当するストーリーです\n"
+#                     "ストーリーをもとに、Stability AIで絵本風のやさしいイラストを生成するためのプロンプトを考えてください\n"
+#                     "条件：\n"
+#                     "・画風は「明るくかわいらしい絵本風」\n"
+#                     "・主人公がどういう姿かも補足してください\n"
+#                     "・プロンプトは英語で書いてください\n"
+#                     "・ファンタジーすぎず、子供が見て安心できるイメージにしてください\n"
+#                     "・アートスタイルは「storybook illustration」\n"
+#                     "・髪色、目の色、服、年齢のプロンプトは必ず最初の方に記載してください\n"
+#                     "・以下のような形式を参考にしてください：\n"
+#                     "出力形式（例）：\n"
+#                     "a young girl with blonde hair wearing a blue dress, smiling in a flower garden, soft pastel colors, storybook illustration, children's picture book style, wide view, gentle lighting"
+#                     "プロンプトをこの形式だけで返してください。\n"
+#                     f"【ストーリー】：\n{story['起']}\n"
+#                 )
+#             }
+#         ]
+#     )
+#     # 画像生成に受け渡すためのプロンプトをimage_prompt_1に格納
+#     #ストリームリット実装時はst.set_state(～～～)に格納する
+#     image_prompt = response.output_text
+#     image_prompts.append(image_prompt)  # image_prompt_1をリストに追加
+#     return image_prompts
+#     #これをsession_stateに格納して保存されるようにする
 
 
 
-"""
-転のストーリー用の画像生成プロンプトを生成する関数。
-image_promptsというリストに新たに格納される。
-"""
-#ここで重要なのはstoryという変数からstory[起]を抽出し受け渡すこと
-def make_prompt_3(story: dict, openai_api_key: str, image_prompts: list) -> str:
-    # OpenAI APIはすでにインポートされているはず
-    #openai_api_key = os.getenv("OPENAI_API_KEY")
-    client = OpenAI(api_key=openai_api_key)
+# """
+# 承のストーリー用の画像生成プロンプトを生成する関数。
+# 「起」に追加して見た目情報の継承もプロンプトとして入れておく
+# image_promptsというリストに新たに格納される。
+# """
+# #ここで重要なのはstoryという変数からstory[起]を抽出し受け渡すこと
+# def make_prompt_2(story: dict, openai_api_key: str, image_prompts) -> str:
+#     # OpenAI APIはすでにインポートされているはず
+#     #openai_api_key = os.getenv("OPENAI_API_KEY")
+#     client = OpenAI(api_key=openai_api_key)
 
-    # GPTへのリクエスト
-    response = client.responses.create(
-        model="gpt-4o-mini",  # コスパ重視モデル！精度欲しいならgpt-4.1でもOK
-        input=[
-            {
-                "role": "system",
-                "content": "あなたはStable Diffusion3.5で３歳～５歳用の絵本に相応しいイラストをつくるプロフェッショナルです。"
-            },
-            {
-                "role": "user",
-                "content": (
-                    "以下は、3歳〜低学年向け絵本の1シーンに相当するストーリーです\n"
-                    "前ページでは下記の画像生成プロンプトを使用しました。登場キャラクターの髪型や服装などビジュアル情報は引き継いでください。\n"
-                    f"前ページプロンプト：\n{image_prompts[1]}\n"
-                    "ストーリーをもとに、Stability AIで絵本風のやさしいイラストを生成するためのプロンプトを考えてください\n"
-                    "条件：\n"
-                    "・画風は「明るくかわいらしい絵本風」\n"
-                    "・主人公がどういう姿かも補足してください\n"
-                    "・プロンプトは英語で書いてください\n"
-                    "・ファンタジーすぎず、子供が見て安心できるイメージにしてください\n"
-                    "・アートスタイルは「storybook illustration」\n"
-                    "・髪色、目の色、服、年齢のプロンプトは必ず最初の方に記載してください\n"
-                    "・以下のような形式を参考にしてください：\n"
-                    "出力形式（例）：\n"
-                    "a young girl with blonde hair wearing a blue dress, smiling in a flower garden, soft pastel colors, storybook illustration, children's picture book style, wide view, gentle lighting"
-                    "プロンプトをこの形式だけで返してください。\n"
-                    f"【ストーリー】：\n{story['転']}\n"
-                )
-            }
-        ]
-    )
-    # 画像生成に受け渡すためのプロンプトをimage_prompt_2に格納
-    #ストリームリット実装時はst.set_state(～～～)に格納する
-    image_prompt = response.output_text
-    image_prompts.append(image_prompt)  # image_prompt_3をリストに追加
-    return image_prompts
-    #これをsession_stateに格納して保存されるようにする
+#     # GPTへのリクエスト
+#     response = client.responses.create(
+#         model="gpt-4o-mini",  # コスパ重視モデル！精度欲しいならgpt-4.1でもOK
+#         input=[
+#             {
+#                 "role": "system",
+#                 "content": "あなたはStable Diffusion3.5で３歳～５歳用の絵本に相応しいイラストをつくるプロフェッショナルです。"
+#             },
+#             {
+#                 "role": "user",
+#                 "content": (
+#                     "以下は、3歳〜低学年向け絵本の1シーンに相当するストーリーです\n"
+#                     "前ページでは下記の画像生成プロンプトを使用しました。登場キャラクターの髪型や服装などビジュアル情報は引き継いでください。\n"
+#                     f"前ページプロンプト：\n{image_prompts[0]}\n"
+#                     "ストーリーをもとに、Stability AIで絵本風のやさしいイラストを生成するためのプロンプトを考えてください\n"
+#                     "条件：\n"
+#                     "・画風は「明るくかわいらしい絵本風」\n"
+#                     "・主人公がどういう姿かも補足してください\n"
+#                     "・プロンプトは英語で書いてください\n"
+#                     "・ファンタジーすぎず、子供が見て安心できるイメージにしてください\n"
+#                     "・アートスタイルは「storybook illustration」\n"
+#                     "・髪色、目の色、服、年齢のプロンプトは必ず最初の方に記載してください\n"
+#                     "・以下のような形式を参考にしてください：\n"
+#                     "出力形式（例）：\n"
+#                     "a young girl with blonde hair wearing a blue dress, smiling in a flower garden, soft pastel colors, storybook illustration, children's picture book style, wide view, gentle lighting"
+#                     "プロンプトをこの形式だけで返してください。\n"
+#                     f"【ストーリー】：\n{story['承']}\n"
+#                 )
+#             }
+#         ]
+#     )
+#     # 画像生成に受け渡すためのプロンプトをimage_prompt_2に格納
+#     #ストリームリット実装時はst.set_state(～～～)に格納する
+#     image_prompt = response.output_text
+#     image_prompts.append(image_prompt)  # image_prompt_2をリストに追加
+#     return image_prompts
+#     #これをsession_stateに格納して保存されるようにする
 
 
-"""
-結のストーリー用の画像生成プロンプトを生成する関数。
-image_promptsというリストに新たに格納される。
-"""
-#ここで重要なのはstoryという変数からstory[起]を抽出し受け渡すこと
-def make_prompt_4(story: dict, openai_api_key: str, image_prompts: list) -> str:
-    # OpenAI APIはすでにインポートされているはず
-    #openai_api_key = os.getenv("OPENAI_API_KEY")
-    client = OpenAI(api_key=openai_api_key)
 
-    # GPTへのリクエスト
-    response = client.responses.create(
-        model="gpt-4o-mini",  # コスパ重視モデル！精度欲しいならgpt-4.1でもOK
-        input=[
-            {
-                "role": "system",
-                "content": "あなたはStable Diffusion3.5で３歳～５歳用の絵本に相応しいイラストをつくるプロフェッショナルです。"
-            },
-            {
-                "role": "user",
-                "content": (
-                    "以下は、3歳〜低学年向け絵本の1シーンに相当するストーリーです\n"
-                    "前ページでは下記の画像生成プロンプトを使用しました。登場キャラクターの髪型や服装などビジュアル情報は引き継いでください。\n"
-                    f"前ページプロンプト：\n{image_prompts[2]}\n"
-                    "ストーリーをもとに、Stability AIで絵本風のやさしいイラストを生成するためのプロンプトを考えてください\n"
-                    "条件：\n"
-                    "・画風は「明るくかわいらしい絵本風」\n"
-                    "・主人公がどういう姿かも補足してください\n"
-                    "・プロンプトは英語で書いてください\n"
-                    "・ファンタジーすぎず、子供が見て安心できるイメージにしてください\n"
-                    "・アートスタイルは「storybook illustration」\n"
-                    "・髪色、目の色、服、年齢のプロンプトは必ず最初の方に記載してください\n"
-                    "・以下のような形式を参考にしてください：\n"
-                    "出力形式（例）：\n"
-                    "a young girl with blonde hair wearing a blue dress, smiling in a flower garden, soft pastel colors, storybook illustration, children's picture book style, wide view, gentle lighting"
-                    "プロンプトをこの形式だけで返してください。\n"
-                    f"【ストーリー】：\n{story['結']}\n"
-                )
-            }
-        ]
-    )
-    # 画像生成に受け渡すためのプロンプトをimage_prompt_2に格納
-    #ストリームリット実装時はst.set_state(～～～)に格納する
-    image_prompt = response.output_text
-    image_prompts.append(image_prompt)  # image_prompt_4をリストに追加
-    return image_prompts
-    #これをsession_stateに格納して保存されるようにする
+# """
+# 転のストーリー用の画像生成プロンプトを生成する関数。
+# image_promptsというリストに新たに格納される。
+# """
+# #ここで重要なのはstoryという変数からstory[起]を抽出し受け渡すこと
+# def make_prompt_3(story: dict, openai_api_key: str, image_prompts: list) -> str:
+#     # OpenAI APIはすでにインポートされているはず
+#     #openai_api_key = os.getenv("OPENAI_API_KEY")
+#     client = OpenAI(api_key=openai_api_key)
+
+#     # GPTへのリクエスト
+#     response = client.responses.create(
+#         model="gpt-4o-mini",  # コスパ重視モデル！精度欲しいならgpt-4.1でもOK
+#         input=[
+#             {
+#                 "role": "system",
+#                 "content": "あなたはStable Diffusion3.5で３歳～５歳用の絵本に相応しいイラストをつくるプロフェッショナルです。"
+#             },
+#             {
+#                 "role": "user",
+#                 "content": (
+#                     "以下は、3歳〜低学年向け絵本の1シーンに相当するストーリーです\n"
+#                     "前ページでは下記の画像生成プロンプトを使用しました。登場キャラクターの髪型や服装などビジュアル情報は引き継いでください。\n"
+#                     f"前ページプロンプト：\n{image_prompts[1]}\n"
+#                     "ストーリーをもとに、Stability AIで絵本風のやさしいイラストを生成するためのプロンプトを考えてください\n"
+#                     "条件：\n"
+#                     "・画風は「明るくかわいらしい絵本風」\n"
+#                     "・主人公がどういう姿かも補足してください\n"
+#                     "・プロンプトは英語で書いてください\n"
+#                     "・ファンタジーすぎず、子供が見て安心できるイメージにしてください\n"
+#                     "・アートスタイルは「storybook illustration」\n"
+#                     "・髪色、目の色、服、年齢のプロンプトは必ず最初の方に記載してください\n"
+#                     "・以下のような形式を参考にしてください：\n"
+#                     "出力形式（例）：\n"
+#                     "a young girl with blonde hair wearing a blue dress, smiling in a flower garden, soft pastel colors, storybook illustration, children's picture book style, wide view, gentle lighting"
+#                     "プロンプトをこの形式だけで返してください。\n"
+#                     f"【ストーリー】：\n{story['転']}\n"
+#                 )
+#             }
+#         ]
+#     )
+#     # 画像生成に受け渡すためのプロンプトをimage_prompt_2に格納
+#     #ストリームリット実装時はst.set_state(～～～)に格納する
+#     image_prompt = response.output_text
+#     image_prompts.append(image_prompt)  # image_prompt_3をリストに追加
+#     return image_prompts
+#     #これをsession_stateに格納して保存されるようにする
+
+
+# """
+# 結のストーリー用の画像生成プロンプトを生成する関数。
+# image_promptsというリストに新たに格納される。
+# """
+# #ここで重要なのはstoryという変数からstory[起]を抽出し受け渡すこと
+# def make_prompt_4(story: dict, openai_api_key: str, image_prompts: list) -> str:
+#     # OpenAI APIはすでにインポートされているはず
+#     #openai_api_key = os.getenv("OPENAI_API_KEY")
+#     client = OpenAI(api_key=openai_api_key)
+
+#     # GPTへのリクエスト
+#     response = client.responses.create(
+#         model="gpt-4o-mini",  # コスパ重視モデル！精度欲しいならgpt-4.1でもOK
+#         input=[
+#             {
+#                 "role": "system",
+#                 "content": "あなたはStable Diffusion3.5で３歳～５歳用の絵本に相応しいイラストをつくるプロフェッショナルです。"
+#             },
+#             {
+#                 "role": "user",
+#                 "content": (
+#                     "以下は、3歳〜低学年向け絵本の1シーンに相当するストーリーです\n"
+#                     "前ページでは下記の画像生成プロンプトを使用しました。登場キャラクターの髪型や服装などビジュアル情報は引き継いでください。\n"
+#                     f"前ページプロンプト：\n{image_prompts[2]}\n"
+#                     "ストーリーをもとに、Stability AIで絵本風のやさしいイラストを生成するためのプロンプトを考えてください\n"
+#                     "条件：\n"
+#                     "・画風は「明るくかわいらしい絵本風」\n"
+#                     "・主人公がどういう姿かも補足してください\n"
+#                     "・プロンプトは英語で書いてください\n"
+#                     "・ファンタジーすぎず、子供が見て安心できるイメージにしてください\n"
+#                     "・アートスタイルは「storybook illustration」\n"
+#                     "・髪色、目の色、服、年齢のプロンプトは必ず最初の方に記載してください\n"
+#                     "・以下のような形式を参考にしてください：\n"
+#                     "出力形式（例）：\n"
+#                     "a young girl with blonde hair wearing a blue dress, smiling in a flower garden, soft pastel colors, storybook illustration, children's picture book style, wide view, gentle lighting"
+#                     "プロンプトをこの形式だけで返してください。\n"
+#                     f"【ストーリー】：\n{story['結']}\n"
+#                 )
+#             }
+#         ]
+#     )
+#     # 画像生成に受け渡すためのプロンプトをimage_prompt_2に格納
+#     #ストリームリット実装時はst.set_state(～～～)に格納する
+#     image_prompt = response.output_text
+#     image_prompts.append(image_prompt)  # image_prompt_4をリストに追加
+#     return image_prompts
+#     #これをsession_stateに格納して保存されるようにする
 
 
 
@@ -526,4 +525,4 @@ def voice_generated(id, text, page):
         with open(save_path, 'wb') as file:
             file.write(response.content)
 
-st.write('apiは正常です')
+#st.write('apiは正常です')
